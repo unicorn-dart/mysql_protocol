@@ -93,6 +93,67 @@ abstract class BinlogStartEventV3
 }
 
 @Packet()
+@Serialized(name: "Binlog::EventHeader")
+abstract class BinlogEventHeader
+    implements SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "timestamp")
+  int get createTimestamp;
+
+  @Field()
+  @SerializedField(name: "event_type")
+  int get eventType;
+
+  @Field()
+  @SerializedField(name: "server_id")
+  int get serverId;
+
+  @Field()
+  @SerializedField(name: "event_size")
+  int get eventSize;
+
+  @Field()
+  @SerializedField(name: "log_pos")
+  int get logPos;
+
+  @Field()
+  @SerializedField(name: "flags")
+  int get flags;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "timestamp",
+      reader: Scalar.fixedLengthInteger(4),
+    );
+    yield context.readAsScalar(
+      name: "event_type",
+      reader: Scalar.fixedLengthInteger(4),
+    );
+    yield context.readAsScalar(
+      name: "server_id",
+      reader: Scalar.fixedLengthInteger(4),
+    );
+    yield context.readAsScalar(
+      name: "event_size",
+      reader: Scalar.fixedLengthInteger(4),
+    );
+    if (context.binlog.binlogVersion > Version(1, 0, 0)) {
+      yield context.readAsScalar(
+        name: "log_pos",
+        reader: Scalar.fixedLengthInteger(4),
+      );
+      yield context.readAsScalar(
+        name: "flags",
+        reader: Scalar.fixedLengthInteger(2),
+      );
+    }
+  }
+}
+
+@Packet()
 @Serialized(name: "Binlog::FORMAT_DESCRIPTION_EVENT")
 abstract class BinlogFormatDescriptionEvent
     implements SerializationStepResolutionDelegate {
@@ -412,66 +473,6 @@ abstract class BinlogQueryEvent implements SerializationStepResolutionDelegate {
       name: "query",
       reader: Scalar.restOfPacketString(),
     );
-  }
-}
-
-@Packet()
-@Serialized(name: "Binlog::EventHeader")
-abstract class BinlogHeader implements SerializationStepResolutionDelegate {
-  @Field()
-  @SerializedField(name: "timestamp")
-  int get createTimestamp;
-
-  @Field()
-  @SerializedField(name: "event_type")
-  int get eventType;
-
-  @Field()
-  @SerializedField(name: "server_id")
-  int get serverId;
-
-  @Field()
-  @SerializedField(name: "event_size")
-  int get eventSize;
-
-  @Field()
-  @SerializedField(name: "log_pos")
-  int get logPos;
-
-  @Field()
-  @SerializedField(name: "flags")
-  int get flags;
-
-  @override
-  Iterable<SerializationStep> resolveSteps(
-    SerializationStepResolutionContext context,
-  ) sync* {
-    yield context.readAsScalar(
-      name: "timestamp",
-      reader: Scalar.fixedLengthInteger(4),
-    );
-    yield context.readAsScalar(
-      name: "event_type",
-      reader: Scalar.fixedLengthInteger(4),
-    );
-    yield context.readAsScalar(
-      name: "server_id",
-      reader: Scalar.fixedLengthInteger(4),
-    );
-    yield context.readAsScalar(
-      name: "event_size",
-      reader: Scalar.fixedLengthInteger(4),
-    );
-    if (context.binlog.binlogVersion > Version(1, 0, 0)) {
-      yield context.readAsScalar(
-        name: "log_pos",
-        reader: Scalar.fixedLengthInteger(4),
-      );
-      yield context.readAsScalar(
-        name: "flags",
-        reader: Scalar.fixedLengthInteger(2),
-      );
-    }
   }
 }
 
