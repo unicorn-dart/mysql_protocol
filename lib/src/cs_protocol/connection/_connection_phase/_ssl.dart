@@ -28,7 +28,7 @@ abstract class SSLRequest implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
+    if (context.capabilities.hasSupported('CLIENT_PROTOCOL_41')) {
       yield context.readAsScalar(
         name: 'client_flag',
         reader: Scalar.fixedLengthInteger(4),

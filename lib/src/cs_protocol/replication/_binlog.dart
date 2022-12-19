@@ -133,7 +133,32 @@ abstract class BinlogStopEvent {}
 
 @Packet()
 @Serialized(name: "ROTATE_EVENT")
-abstract class BinlogRotateEvent {}
+abstract class BinlogRotateEvent
+    implements SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "position")
+  int get position;
+
+  @Field()
+  @SerializedField(name: "binlog")
+  String get binlog;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    if (context.binlog.binlogVersion > Version(1, 0, 0)) {
+      yield context.readAsScalar(
+        name: "position",
+        reader: Scalar.fixedLengthInteger(8),
+      );
+      yield context.readAsScalar(
+        name: "binlog",
+        reader: Scalar.restOfPacketString(),
+      );
+    }
+  }
+}
 
 @Packet()
 @Serialized(name: "SLAVE_EVENT")
@@ -141,7 +166,38 @@ abstract class BinlogSlaveEvent {}
 
 @Packet()
 @Serialized(name: "INCIENT_EVENT")
-abstract class BinlogIncidentEvent {}
+abstract class BinlogIncidentEvent
+    implements SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "type")
+  int get type;
+
+  @Field()
+  @SerializedField(name: "message_length")
+  int get messageLength;
+
+  @Field()
+  @SerializedField(name: "message")
+  String get message;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: 'type',
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    yield context.readAsScalar(
+      name: 'message_length',
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    yield context.readAsScalar(
+      name: 'message',
+      reader: Scalar.fixedLengthInteger(context.fields['message_length']),
+    );
+  }
+}
 
 @Packet()
 @Serialized(name: "HEARTBEAT_EVENT")
@@ -202,9 +258,7 @@ abstract class BinlogQueryEvent implements SerializationStepResolutionDelegate {
       name: "error_code",
       reader: Scalar.fixedLengthInteger(2),
     );
-    final binlogVersion =
-        context.getEnvironment<BinlogEnvironment>().binlogVersion;
-    if (binlogVersion >= Version(4, 0, 0)) {
+    if (context.binlog.binlogVersion >= Version(4, 0, 0)) {
       yield context.readAsScalar(
         name: "status_vars_length",
         reader: Scalar.fixedLengthInteger(2),
@@ -408,9 +462,7 @@ abstract class BinlogHeader implements SerializationStepResolutionDelegate {
       name: "event_size",
       reader: Scalar.fixedLengthInteger(4),
     );
-    final binlogVersion =
-        context.getEnvironment<BinlogEnvironment>().binlogVersion;
-    if (binlogVersion > Version(1, 0, 0)) {
+    if (context.binlog.binlogVersion > Version(1, 0, 0)) {
       yield context.readAsScalar(
         name: "log_pos",
         reader: Scalar.fixedLengthInteger(4),

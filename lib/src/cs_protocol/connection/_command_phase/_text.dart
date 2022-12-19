@@ -54,7 +54,7 @@ abstract class QueryCommand implements SerializationStepResolutionDelegate {
       name: 'command',
       reader: Scalar.fixedLengthInteger(1),
     );
-    if (context.capabilities.contains('CLIENT_QUERY_ATTRIBUTES')) {
+    if (context.capabilities.hasSupported('CLIENT_QUERY_ATTRIBUTES')) {
       yield context.readAsScalar(
         name: 'parameter_count',
         reader: Scalar.lengthEncodedInteger(),

@@ -166,7 +166,7 @@ abstract class HandshakeV10 implements SerializationStepResolutionDelegate {
       name: 'capability_flags_2',
       reader: Scalar.fixedLengthInteger(2),
     );
-    if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
+    if (context.capabilities.hasSupported('CLIENT_PLUGIN_AUTH')) {
       yield context.readAsScalar(
         name: 'auth_plugin_data_len',
         reader: Scalar.fixedLengthInteger(1),
@@ -185,7 +185,7 @@ abstract class HandshakeV10 implements SerializationStepResolutionDelegate {
       name: 'auth_plugin_data_part_1',
       reader: Scalar.lengthEncodedString(),
     );
-    if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
+    if (context.capabilities.hasSupported('CLIENT_PLUGIN_AUTH')) {
       yield context.readAsScalar(
         name: 'auth_plugin_name',
         reader: Scalar.nullTerminatedString(),
@@ -234,7 +234,7 @@ abstract class HandshakeResponse320
       name: 'username',
       reader: Scalar.nullTerminatedString(),
     );
-    if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
+    if (context.capabilities.hasSupported('CLIENT_CONNECT_WITH_DB')) {
       yield context.readAsScalar(
         name: 'auth_response',
         reader: Scalar.nullTerminatedString(),
@@ -329,7 +329,7 @@ abstract class HandshakeResponse41
       reader: Scalar.nullTerminatedString(),
     );
     if (context.capabilities
-        .contains('CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA')) {
+        .hasSupported('CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA')) {
       context.readAsScalar(
         name: 'auth_response',
         reader: Scalar.lengthEncodedString(),
@@ -344,19 +344,19 @@ abstract class HandshakeResponse41
         reader: Scalar.lengthEncodedString(),
       );
     }
-    if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
+    if (context.capabilities.hasSupported('CLIENT_CONNECT_WITH_DB')) {
       context.readAsScalar(
         name: 'database',
         reader: Scalar.nullTerminatedString(),
       );
     }
-    if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
+    if (context.capabilities.hasSupported('CLIENT_PLUGIN_AUTH')) {
       context.readAsScalar(
         name: 'client_plugin_name',
         reader: Scalar.nullTerminatedString(),
       );
     }
-    if (context.capabilities.contains('CLIENT_CONNECT_ATTRS')) {
+    if (context.capabilities.hasSupported('CLIENT_CONNECT_ATTRS')) {
       context.readAsScalar(
         name: 'attrs_length',
         reader: Scalar.lengthEncodedInteger(),

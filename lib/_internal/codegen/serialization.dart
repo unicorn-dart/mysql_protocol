@@ -31,6 +31,13 @@ class Scalar implements DataType, ScalarReader {
   factory Scalar.lengthEncodedString() => throw UnimplementedError();
 
   factory Scalar.restOfPacketString() => throw UnimplementedError();
+
+  factory Scalar.fixedLengthBytes() => throw UnimplementedError();
+
+  factory Scalar.lengthEncodedBytes(int bytesTaken) =>
+      throw UnimplementedError();
+
+  factory Scalar.restOfPacketBytes() => throw UnimplementedError();
 }
 
 typedef SerializationStepResolverFunc = Iterable<SerializationStep> Function(
@@ -38,11 +45,9 @@ typedef SerializationStepResolverFunc = Iterable<SerializationStep> Function(
 );
 
 abstract class SerializationStepResolutionContext {
-  Iterable<String> get capabilities;
-
   Map<String, dynamic> get fields;
 
-  T getEnvironment<T>();
+  T environmentOf<T>();
 
   SerializationStep readAsScalar({
     required String name,
@@ -73,6 +78,15 @@ abstract class SerializationStepResolutionContext {
   Uint8List peek(int bytesTaken);
 }
 
+extension SerializationStepResolutionCapabilitiesExtensions
+    on SerializationStepResolutionContext {
+  CapabilitiesEnvironment get capabilities => throw UnimplementedError();
+
+  MySqlServerEnvironment get mysqlServer => throw UnimplementedError();
+
+  BinlogEnvironment get binlog => throw UnimplementedError();
+}
+
 extension SerializationStepResolutionPeekingExtensions
     on SerializationStepResolutionContext {
   int peekAsInteger({
@@ -86,6 +100,10 @@ extension SerializationStepResolutionPeekingExtensions
   }) {
     throw UnimplementedError();
   }
+}
+
+abstract class CapabilitiesEnvironment implements List<String> {
+  bool hasSupported(String name);
 }
 
 abstract class MySqlServerEnvironment {

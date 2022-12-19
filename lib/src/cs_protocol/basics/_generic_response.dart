@@ -55,7 +55,7 @@ abstract class OKResponse implements SerializationStepResolutionDelegate {
       name: 'last_insert_id',
       reader: Scalar.lengthEncodedInteger(),
     );
-    if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
+    if (context.capabilities.hasSupported('CLIENT_PROTOCOL_41')) {
       yield context.readAsScalar(
         name: 'status_flags',
         reader: Scalar.fixedLengthInteger(2),
@@ -64,18 +64,18 @@ abstract class OKResponse implements SerializationStepResolutionDelegate {
         name: 'warnings',
         reader: Scalar.fixedLengthInteger(2),
       );
-    } else if (context.capabilities.contains('CLIENT_TRANSACTIONS')) {
+    } else if (context.capabilities.hasSupported('CLIENT_TRANSACTIONS')) {
       yield context.readAsScalar(
         name: 'status_flags',
         reader: Scalar.fixedLengthInteger(2),
       );
     }
-    if (context.capabilities.contains('CLIENT_SESSION_TRACK')) {
+    if (context.capabilities.hasSupported('CLIENT_SESSION_TRACK')) {
       yield context.readAsScalar(
         name: 'info',
         reader: Scalar.lengthEncodedString(),
       );
-      if (context.capabilities.contains('SERVER_SESSION_STATE_CHANGED')) {
+      if (context.capabilities.hasSupported('SERVER_SESSION_STATE_CHANGED')) {
         yield context.readAsScalar(
           name: 'session_state_info',
           reader: Scalar.lengthEncodedString(),
@@ -166,7 +166,7 @@ abstract class ErrPacket implements SerializationStepResolutionDelegate {
       name: 'error_code',
       reader: Scalar.fixedLengthInteger(2),
     );
-    if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
+    if (context.capabilities.hasSupported('CLIENT_PROTOCOL_41')) {
       yield context.readAsScalar(
         name: 'sql_state_marker',
         reader: Scalar.fixedLengthString(1),
@@ -208,7 +208,7 @@ abstract class EOFPacket implements SerializationStepResolutionDelegate {
       name: 'header',
       reader: Scalar.fixedLengthInteger(1),
     );
-    if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
+    if (context.capabilities.hasSupported('CLIENT_PROTOCOL_41')) {
       yield context.readAsScalar(
         name: 'warnings',
         reader: Scalar.fixedLengthString(2),
