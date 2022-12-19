@@ -1,4 +1,4 @@
-part of '../lib.dart';
+part of 'lib.dart';
 
 /// For more details, visit [Stored Programs][stored_programs].
 ///

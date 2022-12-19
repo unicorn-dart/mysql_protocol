@@ -1,4 +1,4 @@
-part of '../lib.dart';
+part of 'lib.dart';
 
 /// For more details, visit [Prepared Statements][prepared_stmts].
 ///

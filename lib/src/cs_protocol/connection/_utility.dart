@@ -1,4 +1,4 @@
-part of '../lib.dart';
+part of 'lib.dart';
 
 /// For more details, visit [Text Protocol][text_protocol].
 ///
