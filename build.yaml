@@ -1,0 +1,8 @@
+target:
+  $default:
+    builders:
+      generate_packet:
+        import: "package:mysql_protocol/_internal/codegen/builder.dart"
+        builder_factories: ["myBuilder"]
+        build_extensions: { ".dart": [".my_package.dart"] }
+        auto_apply: root
