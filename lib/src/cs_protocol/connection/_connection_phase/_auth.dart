@@ -23,18 +23,18 @@ abstract class AuthSwitchRequest
   int get pluginProvidedData;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'status_tag',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'plugin_name',
       dataType: DataType.nullTerminatedString(),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'plugin_provided_data',
       dataType: DataType.restOfPacketString(),
     );
@@ -51,10 +51,10 @@ abstract class OldAuthSwitchRequest
   int get statusTag;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'status_tag',
       dataType: DataType.fixedLengthInteger(1),
     );
@@ -70,10 +70,10 @@ abstract class AuthSwitchResponse
   String get authenticationResponseData;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'authentication_response_data',
       dataType: DataType.restOfPacketString(),
     );
@@ -93,14 +93,14 @@ abstract class AuthMoreData implements SerializationStepResolutionDelegate {
   String get data;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'authentication_method_data',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'authentication_method_data',
       dataType: DataType.restOfPacketString(),
     );
@@ -124,18 +124,18 @@ abstract class AuthNextFactor implements SerializationStepResolutionDelegate {
   String get pluginProvidedData;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: "packet_type",
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: "plugin_name",
       dataType: DataType.nullTerminatedString(),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: "plugin_provided_data",
       dataType: DataType.restOfPacketString(),
     );

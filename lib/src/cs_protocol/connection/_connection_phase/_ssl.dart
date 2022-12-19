@@ -25,32 +25,32 @@ abstract class SSLRequest implements SerializationStepResolutionDelegate {
   String get filter;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'client_flag',
         dataType: DataType.fixedLengthInteger(4),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'max_packet_size',
         dataType: DataType.fixedLengthInteger(4),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'character_set',
         dataType: DataType.fixedLengthInteger(1),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'filter',
         dataType: DataType.fixedLengthString(23),
       );
     } else {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'client_flag',
         dataType: DataType.fixedLengthInteger(2),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'max_packet_size',
         dataType: DataType.fixedLengthInteger(3),
       );

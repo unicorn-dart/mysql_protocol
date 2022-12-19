@@ -29,22 +29,22 @@ abstract class HandshakeV9 implements SerializationStepResolutionDelegate {
   String get scramble;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'protocol_version',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'server_version',
       dataType: DataType.nullTerminatedString(),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'thread_id',
       dataType: DataType.fixedLengthInteger(4),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'scramble',
       dataType: DataType.nullTerminatedString(),
     );
@@ -127,66 +127,66 @@ abstract class HandshakeV10 implements SerializationStepResolutionDelegate {
   String get authPluginName;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'protocol_version',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'server_version',
       dataType: DataType.nullTerminatedString(),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'thread_id',
       dataType: DataType.fixedLengthInteger(4),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'auth_plugin_data_part_1',
       dataType: DataType.fixedLengthString(8),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'filter',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'capability_flags_1',
       dataType: DataType.fixedLengthInteger(2),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'character_set',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'status_flags',
       dataType: DataType.fixedLengthInteger(2),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'capability_flags_2',
       dataType: DataType.fixedLengthInteger(2),
     );
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'auth_plugin_data_len',
         dataType: DataType.fixedLengthInteger(1),
       );
     } else {
-      yield context.answerStep(
+      yield context.readAsField(
         name: '00',
         dataType: DataType.fixedLengthInteger(1),
       );
     }
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'reversed',
       dataType: DataType.fixedLengthString(10),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'auth_plugin_data_part_1',
       dataType: DataType.lengthEncodedString(),
     );
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'auth_plugin_name',
         dataType: DataType.nullTerminatedString(),
       );
@@ -219,32 +219,32 @@ abstract class HandshakeResponse320
   String get database;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'client_flag',
       dataType: DataType.fixedLengthInteger(2),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'max_packet_size',
       dataType: DataType.fixedLengthInteger(3),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'username',
       dataType: DataType.nullTerminatedString(),
     );
     if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'auth_response',
         dataType: DataType.nullTerminatedString(),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'database',
         dataType: DataType.nullTerminatedString(),
       );
     } else {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'auth_response',
         dataType: DataType.restOfPacketString(),
       );
@@ -305,59 +305,59 @@ abstract class HandshakeResponse41
   int get zstdCompressionLevel;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    context.answerStep(
+    context.readAsField(
       name: 'client_flag',
       dataType: DataType.fixedLengthInteger(4),
     );
-    context.answerStep(
+    context.readAsField(
       name: 'max_packet_size',
       dataType: DataType.fixedLengthInteger(4),
     );
-    context.answerStep(
+    context.readAsField(
       name: 'character_set',
       dataType: DataType.fixedLengthInteger(1),
     );
-    context.answerStep(
+    context.readAsField(
       name: 'filter',
       dataType: DataType.fixedLengthString(23),
     );
-    context.answerStep(
+    context.readAsField(
       name: 'username',
       dataType: DataType.nullTerminatedString(),
     );
     if (context.capabilities
         .contains('CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA')) {
-      context.answerStep(
+      context.readAsField(
         name: 'auth_response',
         dataType: DataType.lengthEncodedString(),
       );
     } else {
-      context.answerStep(
+      context.readAsField(
         name: 'auth_response_length',
         dataType: DataType.fixedLengthInteger(1),
       );
-      context.answerStep(
+      context.readAsField(
         name: 'username',
         dataType: DataType.lengthEncodedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
-      context.answerStep(
+      context.readAsField(
         name: 'database',
         dataType: DataType.nullTerminatedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      context.answerStep(
+      context.readAsField(
         name: 'client_plugin_name',
         dataType: DataType.nullTerminatedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_CONNECT_ATTRS')) {
-      context.answerStep(
+      context.readAsField(
         name: 'attrs_length',
         dataType: DataType.lengthEncodedInteger(),
       );
@@ -365,7 +365,7 @@ abstract class HandshakeResponse41
       //
       // streaming attributes...
     }
-    context.answerStep(
+    context.readAsField(
       name: 'zstd_compression_level',
       dataType: DataType.fixedLengthInteger(1),
     );

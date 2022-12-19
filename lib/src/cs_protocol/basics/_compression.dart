@@ -1,9 +1,14 @@
 part of 'lib.dart';
 
-class CompressedPacket implements SerializableObject {
-  CompressedPacket({
+/// For more details, visit [Compression][compression].
+///
+/// [compression]: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_compression.html
+///
+
+class MySqlCompressedPacket implements SerializableObject {
+  MySqlCompressedPacket({
     required int sequenceId,
-    required Iterable<Packet> packets,
+    required Iterable<MySqlPacket> packets,
   })  : _sequenceId = sequenceId,
         _packets = packets;
 
@@ -11,9 +16,9 @@ class CompressedPacket implements SerializableObject {
 
   int get sequenceId => _sequenceId;
 
-  final Iterable<Packet> _packets;
+  final Iterable<MySqlPacket> _packets;
 
-  Iterable<Packet> get packets => _packets;
+  Iterable<MySqlPacket> get packets => _packets;
 
   Uint8List get rawPayload => Uint8List.fromList([
         ..._packets
@@ -63,10 +68,10 @@ class CompressedPacket implements SerializableObject {
   }
 }
 
-class UncompressedPacket implements SerializableObject {
-  const UncompressedPacket({
+class MySqlUncompressedPacket implements SerializableObject {
+  const MySqlUncompressedPacket({
     required int sequenceId,
-    required Iterable<Packet> packets,
+    required Iterable<MySqlPacket> packets,
   })  : _sequenceId = sequenceId,
         _packets = packets;
 
@@ -74,7 +79,7 @@ class UncompressedPacket implements SerializableObject {
 
   int get sequenceId => _sequenceId;
 
-  final Iterable<Packet> _packets;
+  final Iterable<MySqlPacket> _packets;
 
   Uint8List get payload => Uint8List.fromList([
         ..._packets

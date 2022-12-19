@@ -21,7 +21,7 @@ class PacketBuilder {
     _payload = Uint8List.fromList(payload.codeUnits);
   }
 
-  Packet build() {
+  MySqlPacket build() {
     // ignore: prefer_conditional_assignment
     if (_sequenceId == null) {
       _sequenceId = 0;
@@ -32,7 +32,7 @@ class PacketBuilder {
       _payload = Uint8List(0);
     }
 
-    return Packet(
+    return MySqlPacket(
       sequenceId: _sequenceId!,
       payload: _payload!,
     );
@@ -46,27 +46,27 @@ class CompressedPacketBuilder {
   int? _sequenceId;
 
   // ignore: prefer_final_fields
-  List<Packet> _packets = [];
+  List<MySqlPacket> _packets = [];
 
   void withSequenceId(int sequenceId) {
     _sequenceId = _sequenceId;
   }
 
-  void addPacket(Packet packet) {
+  void addPacket(MySqlPacket packet) {
     _packets.add(packet);
   }
 
-  void addPackets(Iterable<Packet> packets) {
+  void addPackets(Iterable<MySqlPacket> packets) {
     _packets.addAll(packets.toList());
   }
 
-  CompressedPacket build() {
+  MySqlCompressedPacket build() {
     // ignore: prefer_conditional_assignment
     if (_sequenceId == null) {
       _sequenceId = 0;
     }
 
-    return CompressedPacket(
+    return MySqlCompressedPacket(
       sequenceId: _sequenceId!,
       packets: _packets,
     );

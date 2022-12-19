@@ -7,7 +7,7 @@ part of 'lib.dart';
 
 @Packet()
 @Serialized(name: "OK_Packet")
-abstract class OkResponse implements SerializationStepResolutionDelegate {
+abstract class OKResponse implements SerializationStepResolutionDelegate {
   /// 0x00 or 0xFE the OK packet header
   @Field()
   @SerializedField(name: 'header')
@@ -40,49 +40,49 @@ abstract class OkResponse implements SerializationStepResolutionDelegate {
   SessionStateInfo get sessionStateInfo;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'header',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'affected_rows',
       dataType: DataType.lengthEncodedInteger(),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'last_insert_id',
       dataType: DataType.lengthEncodedInteger(),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'status_flags',
         dataType: DataType.fixedLengthInteger(2),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'warnings',
         dataType: DataType.fixedLengthInteger(2),
       );
     } else if (context.capabilities.contains('CLIENT_TRANSACTIONS')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'status_flags',
         dataType: DataType.fixedLengthInteger(2),
       );
     }
     if (context.capabilities.contains('CLIENT_SESSION_TRACK')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'info',
         dataType: DataType.lengthEncodedString(),
       );
       if (context.capabilities.contains('SERVER_SESSION_STATE_CHANGED')) {
-        yield context.answerStep(
+        yield context.readAsField(
           name: 'session_state_info',
           dataType: DataType.lengthEncodedString(),
         );
       }
     } else {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'session_state_info',
         dataType: DataType.restOfPacketString(),
       );
@@ -155,28 +155,28 @@ abstract class ErrPacket implements SerializationStepResolutionDelegate {
   String get sqlState;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'header',
       dataType: DataType.fixedLengthInteger(1),
     );
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'error_code',
       dataType: DataType.fixedLengthInteger(2),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'sql_state_marker',
         dataType: DataType.fixedLengthString(1),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'sql_state',
         dataType: DataType.fixedLengthString(5),
       );
     }
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'error_message',
       dataType: DataType.restOfPacketString(),
     );
@@ -185,7 +185,7 @@ abstract class ErrPacket implements SerializationStepResolutionDelegate {
 
 @Packet()
 @Serialized(name: "EOF_Packet")
-abstract class EofPacket implements SerializationStepResolutionDelegate {
+abstract class EOFPacket implements SerializationStepResolutionDelegate {
   @Field()
   @SerializedField(name: 'header')
   int get header;
@@ -201,51 +201,22 @@ abstract class EofPacket implements SerializationStepResolutionDelegate {
   ServerStatus get statusFlags;
 
   @override
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
   ) sync* {
-    yield context.answerStep(
+    yield context.readAsField(
       name: 'header',
       dataType: DataType.fixedLengthInteger(1),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'warnings',
         dataType: DataType.fixedLengthString(2),
       );
-      yield context.answerStep(
+      yield context.readAsField(
         name: 'status_flags',
         dataType: DataType.fixedLengthString(2),
       );
     }
   }
-}
-
-@Reference(
-  kind: ReferenceKind.kEnumeration,
-)
-class ServerStatus {
-  const ServerStatus({
-    required this.name,
-    required this.bitwise,
-  });
-
-  @Field()
-  final String name;
-
-  @Field()
-  @Reference(
-    kind: ReferenceKind.kEnumerationKey,
-  )
-  final int bitwise;
-
-  static const kServerStatusInTrans = ServerStatus(
-    name: "SERVER_STATUS_IN_TRANS",
-    bitwise: 0x00000001,
-  );
-
-  static const kServerStatusAutoCommit = ServerStatus(
-    name: "SERVER_STATUS_AUTOCOMMIT",
-    bitwise: 0x00000002,
-  );
 }

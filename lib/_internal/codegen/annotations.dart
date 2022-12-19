@@ -2,6 +2,10 @@ class Packet {
   const Packet();
 }
 
+class Field {
+  const Field();
+}
+
 class Serialized {
   const Serialized({
     required String name,
@@ -12,56 +16,10 @@ class DataModel {
   const DataModel();
 }
 
-class Field {
-  const Field();
-}
-
 class SerializedField {
   const SerializedField({
     required String name,
   });
-}
-
-class DataType {
-  const DataType();
-
-  const DataType.fixedLengthInteger(int bytesTaken);
-
-  const DataType.lengthEncodedInteger();
-
-  const DataType.fixedLengthString(int bytesTaken);
-
-  const DataType.nullTerminatedString();
-
-  const DataType.variableLengthString(int bytesTaken);
-
-  const DataType.lengthEncodedString();
-
-  const DataType.restOfPacketString();
-}
-
-abstract class SerializationStepAnswerContext {
-  Iterable<String> get capabilities;
-
-  Map<String, dynamic> get fields;
-
-  SerializationStep answerStep({
-    required String name,
-    required DataType dataType,
-  });
-}
-
-class SerializationStep {
-  const SerializationStep({
-    required String name,
-    required DataType dataType,
-  });
-}
-
-abstract class SerializationStepResolutionDelegate {
-  Iterable<SerializationStep> answerSerializationStep(
-    SerializationStepAnswerContext context,
-  );
 }
 
 class Capabilities {
@@ -75,11 +33,18 @@ class Reference {
 }
 
 class ReferenceKind {
-  const ReferenceKind(String name);
+  const ReferenceKind._internal(String name);
 
-  static const kDataModel = ReferenceKind("data_model");
+  static const kDataType = ReferenceKind._internal("DATA_TYPE");
 
-  static const kEnumeration = ReferenceKind("enumeration");
+  static const kEnumeration = ReferenceKind._internal("ENUMERATION");
 
-  static const kEnumerationKey = ReferenceKind("enumeration_key");
+  static const kEnumerationItem = ReferenceKind._internal("ENUMERATION_ITEM");
+
+  static const kEnumerationPrimaryKey =
+      ReferenceKind._internal("ENUMERATION_PRIMARY_KEY");
+
+  static const kBitMask = ReferenceKind._internal("BIT_MASK");
+
+  static const kBitMaskItem = ReferenceKind._internal("BIT_MASK");
 }

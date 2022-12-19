@@ -1,7 +1,12 @@
 part of 'lib.dart';
 
-class Packet implements SerializableObject {
-  const Packet({
+/// For more details, visit [MySQL Packets][mysql_packets].
+///
+/// [mysql_packets]: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_basic_packets.html
+///
+
+class MySqlPacket implements SerializableObject {
+  const MySqlPacket({
     required int sequenceId,
     required Uint8List payload,
   })  : _sequenceId = sequenceId,
