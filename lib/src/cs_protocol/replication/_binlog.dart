@@ -58,41 +58,6 @@ abstract class BinlogDumpCommand
 }
 
 @Packet()
-@Serialized(name: "START_EVENT_V3")
-abstract class BinlogStartEventV3
-    implements SerializationStepResolutionDelegate {
-  @Field()
-  @SerializedField(name: "binlog_version")
-  int get binlogVersion;
-
-  @Field()
-  @SerializedField(name: "mysql_server_version")
-  String get mysqlServerVersion;
-
-  @Field()
-  @SerializedField(name: "create_timestamp")
-  int get createTimestamp;
-
-  @override
-  Iterable<SerializationStep> resolveSteps(
-    SerializationStepResolutionContext context,
-  ) sync* {
-    yield context.readAsScalar(
-      name: "binlog_version",
-      reader: Scalar.fixedLengthInteger(2),
-    );
-    yield context.readAsScalar(
-      name: "mysql_server_version",
-      reader: Scalar.fixedLengthString(50),
-    );
-    yield context.readAsScalar(
-      name: "create_timestamp",
-      reader: Scalar.fixedLengthInteger(4),
-    );
-  }
-}
-
-@Packet()
 @Serialized(name: "Binlog::EventHeader")
 abstract class BinlogEventHeader
     implements SerializationStepResolutionDelegate {
@@ -150,6 +115,41 @@ abstract class BinlogEventHeader
         reader: Scalar.fixedLengthInteger(2),
       );
     }
+  }
+}
+
+@Packet()
+@Serialized(name: "START_EVENT_V3")
+abstract class BinlogStartEventV3
+    implements SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "binlog_version")
+  int get binlogVersion;
+
+  @Field()
+  @SerializedField(name: "mysql_server_version")
+  String get mysqlServerVersion;
+
+  @Field()
+  @SerializedField(name: "create_timestamp")
+  int get createTimestamp;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "binlog_version",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    yield context.readAsScalar(
+      name: "mysql_server_version",
+      reader: Scalar.fixedLengthString(50),
+    );
+    yield context.readAsScalar(
+      name: "create_timestamp",
+      reader: Scalar.fixedLengthInteger(4),
+    );
   }
 }
 
