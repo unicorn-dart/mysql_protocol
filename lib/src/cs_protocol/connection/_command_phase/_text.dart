@@ -50,54 +50,54 @@ abstract class QueryCommand implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'command',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
     if (context.capabilities.contains('CLIENT_QUERY_ATTRIBUTES')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'parameter_count',
-        dataType: DataType.lengthEncodedInteger(),
+        reader: Scalar.lengthEncodedInteger(),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'parameter_set_count',
-        dataType: DataType.lengthEncodedInteger(),
+        reader: Scalar.lengthEncodedInteger(),
       );
       if (context.fields['parameter_count'] > 0) {
-        yield context.readAsField(
+        yield context.readAsScalar(
           name: 'null_bitmap',
-          dataType: DataType.variableLengthString(
+          reader: Scalar.variableLengthString(
               (context.fields['parameter_count'] + 7) / 8),
         );
-        yield context.readAsField(
+        yield context.readAsScalar(
           name: 'new_params_bind_flag',
-          dataType: DataType.fixedLengthInteger(1),
+          reader: Scalar.fixedLengthInteger(1),
         );
         if (context.fields['new_params_bind_flag']) {
           for (var i = 0; i < context.fields['parameter_count']; i++) {
             if (context.fields['new_params_bind_flag']) {
-              yield context.readAsField(
+              yield context.readAsScalar(
                 name: 'param_type_and_flag[]',
-                dataType: DataType.fixedLengthInteger(2),
+                reader: Scalar.fixedLengthInteger(2),
               );
-              yield context.readAsField(
+              yield context.readAsScalar(
                 name: 'parameter_name[]',
-                dataType: DataType.lengthEncodedString(),
+                reader: Scalar.lengthEncodedString(),
               );
             }
           }
         }
         for (var i = 0; i < context.fields['parameter_count']; i++) {
-          yield context.readAsField(
+          yield context.readAsScalar(
             name: 'parameter_values',
-            dataType: DataType.lengthEncodedString(),
+            reader: Scalar.lengthEncodedString(),
           );
         }
       }
     }
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'query',
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }

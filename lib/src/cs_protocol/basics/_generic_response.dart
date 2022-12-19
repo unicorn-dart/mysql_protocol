@@ -43,48 +43,48 @@ abstract class OKResponse implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'header',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'affected_rows',
-      dataType: DataType.lengthEncodedInteger(),
+      reader: Scalar.lengthEncodedInteger(),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'last_insert_id',
-      dataType: DataType.lengthEncodedInteger(),
+      reader: Scalar.lengthEncodedInteger(),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'status_flags',
-        dataType: DataType.fixedLengthInteger(2),
+        reader: Scalar.fixedLengthInteger(2),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'warnings',
-        dataType: DataType.fixedLengthInteger(2),
+        reader: Scalar.fixedLengthInteger(2),
       );
     } else if (context.capabilities.contains('CLIENT_TRANSACTIONS')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'status_flags',
-        dataType: DataType.fixedLengthInteger(2),
+        reader: Scalar.fixedLengthInteger(2),
       );
     }
     if (context.capabilities.contains('CLIENT_SESSION_TRACK')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'info',
-        dataType: DataType.lengthEncodedString(),
+        reader: Scalar.lengthEncodedString(),
       );
       if (context.capabilities.contains('SERVER_SESSION_STATE_CHANGED')) {
-        yield context.readAsField(
+        yield context.readAsScalar(
           name: 'session_state_info',
-          dataType: DataType.lengthEncodedString(),
+          reader: Scalar.lengthEncodedString(),
         );
       }
     } else {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'session_state_info',
-        dataType: DataType.restOfPacketString(),
+        reader: Scalar.restOfPacketString(),
       );
     }
   }
@@ -158,27 +158,27 @@ abstract class ErrPacket implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'header',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'error_code',
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'sql_state_marker',
-        dataType: DataType.fixedLengthString(1),
+        reader: Scalar.fixedLengthString(1),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'sql_state',
-        dataType: DataType.fixedLengthString(5),
+        reader: Scalar.fixedLengthString(5),
       );
     }
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'error_message',
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }
@@ -204,18 +204,18 @@ abstract class EOFPacket implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'header',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'warnings',
-        dataType: DataType.fixedLengthString(2),
+        reader: Scalar.fixedLengthString(2),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'status_flags',
-        dataType: DataType.fixedLengthString(2),
+        reader: Scalar.fixedLengthString(2),
       );
     }
   }

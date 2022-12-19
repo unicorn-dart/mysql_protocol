@@ -32,21 +32,21 @@ abstract class HandshakeV9 implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'protocol_version',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'server_version',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'thread_id',
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'scramble',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
   }
 }
@@ -130,65 +130,65 @@ abstract class HandshakeV10 implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'protocol_version',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'server_version',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'thread_id',
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'auth_plugin_data_part_1',
-      dataType: DataType.fixedLengthString(8),
+      reader: Scalar.fixedLengthString(8),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'filter',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'capability_flags_1',
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'character_set',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'status_flags',
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'capability_flags_2',
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'auth_plugin_data_len',
-        dataType: DataType.fixedLengthInteger(1),
+        reader: Scalar.fixedLengthInteger(1),
       );
     } else {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: '00',
-        dataType: DataType.fixedLengthInteger(1),
+        reader: Scalar.fixedLengthInteger(1),
       );
     }
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'reversed',
-      dataType: DataType.fixedLengthString(10),
+      reader: Scalar.fixedLengthString(10),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'auth_plugin_data_part_1',
-      dataType: DataType.lengthEncodedString(),
+      reader: Scalar.lengthEncodedString(),
     );
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'auth_plugin_name',
-        dataType: DataType.nullTerminatedString(),
+        reader: Scalar.nullTerminatedString(),
       );
     }
   }
@@ -222,31 +222,31 @@ abstract class HandshakeResponse320
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'client_flag',
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'max_packet_size',
-      dataType: DataType.fixedLengthInteger(3),
+      reader: Scalar.fixedLengthInteger(3),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'username',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
     if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'auth_response',
-        dataType: DataType.nullTerminatedString(),
+        reader: Scalar.nullTerminatedString(),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'database',
-        dataType: DataType.nullTerminatedString(),
+        reader: Scalar.nullTerminatedString(),
       );
     } else {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'auth_response',
-        dataType: DataType.restOfPacketString(),
+        reader: Scalar.restOfPacketString(),
       );
     }
   }
@@ -308,66 +308,66 @@ abstract class HandshakeResponse41
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    context.readAsField(
+    context.readAsScalar(
       name: 'client_flag',
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    context.readAsField(
+    context.readAsScalar(
       name: 'max_packet_size',
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    context.readAsField(
+    context.readAsScalar(
       name: 'character_set',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    context.readAsField(
+    context.readAsScalar(
       name: 'filter',
-      dataType: DataType.fixedLengthString(23),
+      reader: Scalar.fixedLengthString(23),
     );
-    context.readAsField(
+    context.readAsScalar(
       name: 'username',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
     if (context.capabilities
         .contains('CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA')) {
-      context.readAsField(
+      context.readAsScalar(
         name: 'auth_response',
-        dataType: DataType.lengthEncodedString(),
+        reader: Scalar.lengthEncodedString(),
       );
     } else {
-      context.readAsField(
+      context.readAsScalar(
         name: 'auth_response_length',
-        dataType: DataType.fixedLengthInteger(1),
+        reader: Scalar.fixedLengthInteger(1),
       );
-      context.readAsField(
+      context.readAsScalar(
         name: 'username',
-        dataType: DataType.lengthEncodedString(),
+        reader: Scalar.lengthEncodedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_CONNECT_WITH_DB')) {
-      context.readAsField(
+      context.readAsScalar(
         name: 'database',
-        dataType: DataType.nullTerminatedString(),
+        reader: Scalar.nullTerminatedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_PLUGIN_AUTH')) {
-      context.readAsField(
+      context.readAsScalar(
         name: 'client_plugin_name',
-        dataType: DataType.nullTerminatedString(),
+        reader: Scalar.nullTerminatedString(),
       );
     }
     if (context.capabilities.contains('CLIENT_CONNECT_ATTRS')) {
-      context.readAsField(
+      context.readAsScalar(
         name: 'attrs_length',
-        dataType: DataType.lengthEncodedInteger(),
+        reader: Scalar.lengthEncodedInteger(),
       );
       // TODO(coocoa): Implement stream fetching within serialization context.
       //
       // streaming attributes...
     }
-    context.readAsField(
+    context.readAsScalar(
       name: 'zstd_compression_level',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
   }
 }

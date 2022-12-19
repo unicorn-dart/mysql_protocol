@@ -1,4 +1,4 @@
-part of 'lib.dart';
+part of "lib.dart";
 
 /// [BinlogDumpCommand] represents COM_BIGLOG_DUMP command.
 ///
@@ -11,48 +11,48 @@ part of 'lib.dart';
 abstract class BinlogDumpCommand
     implements SerializationStepResolutionDelegate {
   @Field()
-  @SerializedField(name: 'status')
+  @SerializedField(name: "status")
   int get status;
 
   @Field()
-  @SerializedField(name: 'binlog_pos')
+  @SerializedField(name: "binlog_pos")
   int get binlogPos;
 
   @Field()
-  @SerializedField(name: 'flags')
+  @SerializedField(name: "flags")
   int get flags;
 
   @Field()
-  @SerializedField(name: 'server_id')
+  @SerializedField(name: "server_id")
   int get serverId;
 
   @Field()
-  @SerializedField(name: 'binlog_filename')
+  @SerializedField(name: "binlog_filename")
   String get binlogFilename;
 
   @override
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
-      name: 'status',
-      dataType: DataType.fixedLengthInteger(1),
+    yield context.readAsScalar(
+      name: "status",
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
-      name: 'binlog_pos',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "binlog_pos",
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
-      name: 'flags',
-      dataType: DataType.fixedLengthInteger(2),
+    yield context.readAsScalar(
+      name: "flags",
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
-      name: 'server_id',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "server_id",
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
-      name: 'binlog_filename',
-      dataType: DataType.restOfPacketString(),
+    yield context.readAsScalar(
+      name: "binlog_filename",
+      reader: Scalar.restOfPacketString(),
     );
   }
 }
@@ -77,17 +77,17 @@ abstract class BinlogStartEventV3
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "binlog_version",
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "mysql_server_version",
-      dataType: DataType.fixedLengthString(50),
+      reader: Scalar.fixedLengthString(50),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "create_timestamp",
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
   }
 }
@@ -112,17 +112,17 @@ abstract class BinlogFormatDescriptionEvent
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "binlog_version",
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "mysql_server_version",
-      dataType: DataType.fixedLengthString(50),
+      reader: Scalar.fixedLengthString(50),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "create_timestamp",
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
   }
 }
@@ -174,34 +174,190 @@ abstract class BinlogQueryEvent implements SerializationStepResolutionDelegate {
   @SerializedField(name: "status_vars")
   Map<BinlogQueryStatusVarKey, BinlogQueryStatusVarValue> get statusVars;
 
+  @Field()
+  @SerializedField(name: "schema")
+  String get schema;
+
+  @Field()
+  @SerializedField(name: "query")
+  String get query;
+
   @override
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "slave_proxy_id",
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "execution_time",
-      dataType: DataType.fixedLengthInteger(4),
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "schema_length",
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "error_code",
-      dataType: DataType.fixedLengthInteger(2),
+      reader: Scalar.fixedLengthInteger(2),
     );
     final binlogVersion =
         context.getEnvironment<BinlogEnvironment>().binlogVersion;
     if (binlogVersion >= Version(4, 0, 0)) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: "status_vars_length",
-        dataType: DataType.fixedLengthInteger(2),
+        reader: Scalar.fixedLengthInteger(2),
       );
+      for (var i = 0; i < context.fields["status_vars_length"]; i++) {
+        final statusVarKey = BinlogQueryStatusVarKey.from(context.peekAsInteger(
+          dataType: Scalar.fixedLengthInteger(1),
+        ));
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kFlags2Code) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(BinlogQueryStatusVarFlags2Code),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kSqlModeCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(BinlogQueryStatusVarSqlModeCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kAutoIncrement) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarAutoIncrement),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kCatalog) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(BinlogQueryStatusVarCatalog),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kCharsetCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(BinlogQueryStatusVarCharsetCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kTimeZoneCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarTimeZoneCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kCatalogNzCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarCatalogNzCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kLCTimeNamesCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarLCTimeNamesCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kCharsetDatabaseCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarCharsetDatabaseCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kTableMapForUpdateCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(
+                BinlogQueryStatusVarTableMapForUpdateCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kMasterDataWrittenCode) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(
+                BinlogQueryStatusVarMasterDataWrittenCode),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kInvokers) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader: ReferencedObject.from(BinlogQueryStatusVarInvokers),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kUpdatedDbNames) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarUpdatedDbNames),
+          );
+        }
+
+        if (statusVarKey == BinlogQueryStatusVarKey.kMicroseconds) {
+          yield context.readAsMapEntry(
+            name: "status_vars",
+            keyReader: Scalar.fixedLengthInteger(1),
+            keyType: ReferencedObject.from(BinlogQueryStatusVarKey),
+            valueReader:
+                ReferencedObject.from(BinlogQueryStatusVarMicroseconds),
+          );
+        }
+      }
     }
+    yield context.readAsScalar(
+      name: "database",
+      reader: Scalar.nullTerminatedString(),
+    );
+    yield context.readAsScalar(
+      name: "query",
+      reader: Scalar.restOfPacketString(),
+    );
   }
 }
 
@@ -236,48 +392,76 @@ abstract class BinlogHeader implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
-      name: 'timestamp',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "timestamp",
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
-      name: 'event_type',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "event_type",
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
-      name: 'server_id',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "server_id",
+      reader: Scalar.fixedLengthInteger(4),
     );
-    yield context.readAsField(
-      name: 'event_size',
-      dataType: DataType.fixedLengthInteger(4),
+    yield context.readAsScalar(
+      name: "event_size",
+      reader: Scalar.fixedLengthInteger(4),
     );
     final binlogVersion =
         context.getEnvironment<BinlogEnvironment>().binlogVersion;
     if (binlogVersion > Version(1, 0, 0)) {
-      yield context.readAsField(
-        name: 'log_pos',
-        dataType: DataType.fixedLengthInteger(4),
+      yield context.readAsScalar(
+        name: "log_pos",
+        reader: Scalar.fixedLengthInteger(4),
       );
-      yield context.readAsField(
-        name: 'flags',
-        dataType: DataType.fixedLengthInteger(2),
+      yield context.readAsScalar(
+        name: "flags",
+        reader: Scalar.fixedLengthInteger(2),
       );
     }
   }
 }
 
 @Reference(kind: ReferenceKind.kEnumeration)
-class BinlogQueryStatusVarKey {
+class BinlogQueryStatusVarKey with EquatableMixin {
   const BinlogQueryStatusVarKey({
     required this.name,
     required this.code,
   });
 
+  factory BinlogQueryStatusVarKey.from(int code) =>
+      allPossible.firstWhere((x) => x.code == code);
+
   final String name;
 
   @Reference(kind: ReferenceKind.kEnumerationPrimaryKey)
   final int code;
+
+  @override
+  List<Object> get props => [code];
+
+  @override
+  String toString() {
+    return "$name(${code.toRadixString(16)})";
+  }
+
+  static const allPossible = [
+    kFlags2Code,
+    kSqlModeCode,
+    kAutoIncrement,
+    kCatalog,
+    kCharsetCode,
+    kTimeZoneCode,
+    kCatalogNzCode,
+    kLCTimeNamesCode,
+    kCharsetDatabaseCode,
+    kTableMapForUpdateCode,
+    kMasterDataWrittenCode,
+    kInvokers,
+    kUpdatedDbNames,
+    kMicroseconds
+  ];
 
   @Reference(kind: ReferenceKind.kEnumerationItem)
   static const kFlags2Code = BinlogQueryStatusVarKey(
@@ -366,13 +550,18 @@ class BinlogQueryStatusVarKey {
 
 abstract class BinlogQueryStatusVarValue {}
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_FLAGS2_CODE")
 abstract class BinlogQueryStatusVarFlags2Code
     implements BinlogQueryStatusVarValue {
+  @Field()
+  @SerializedField(name: "bit_mask")
   int get bitMask;
 }
 
 @Reference(kind: ReferenceKind.kBitMask)
 class BinlogQueryStatusVarFlags2CodeBitMask
+    with EquatableMixin
     implements BitMask<BinlogQueryStatusVarFlags2CodeBitMask> {
   const BinlogQueryStatusVarFlags2CodeBitMask({
     required this.name,
@@ -384,22 +573,34 @@ class BinlogQueryStatusVarFlags2CodeBitMask
   @override
   final int bitMask;
 
+  @override
+  List<Object> get props => [bitMask];
+
+  @override
+  String toString() {
+    return "$name(${bitMask.toRadixString(16)})";
+  }
+
+  @Reference(kind: ReferenceKind.kBitMaskItem)
   static const kOptionAutoIsNull = BinlogQueryStatusVarFlags2CodeBitMask(
     name: "OPTION_AUTO_IS_NULL",
     bitMask: 0x00004000,
   );
 
+  @Reference(kind: ReferenceKind.kBitMaskItem)
   static const kOptionNotAutoCommit = BinlogQueryStatusVarFlags2CodeBitMask(
     name: "OPTION_NOT_AUTOCOMMIT",
     bitMask: 0x00080000,
   );
 
+  @Reference(kind: ReferenceKind.kBitMaskItem)
   static const kOptionNoForeignKeyChecks =
       BinlogQueryStatusVarFlags2CodeBitMask(
     name: "OPTION_NO_FOREIGN_KEY_CHECKS",
     bitMask: 0x04000000,
   );
 
+  @Reference(kind: ReferenceKind.kBitMaskItem)
   static const kOptionRelaxedUniqueChecks =
       BinlogQueryStatusVarFlags2CodeBitMask(
     name: "OPTION_RELAXED_UNIQUE_CHECKS",
@@ -407,13 +608,18 @@ class BinlogQueryStatusVarFlags2CodeBitMask
   );
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_SQL_MODE_CODE")
 abstract class BinlogQueryStatusVarSqlModeCode
     implements BinlogQueryStatusVarValue {
+  @Field()
+  @SerializedField(name: "bit_mask")
   int get bitMask;
 }
 
 @Reference(kind: ReferenceKind.kBitMask)
 class BinlogQueryStatusVarSqlModeCodeBitMask
+    with EquatableMixin
     implements BitMask<BinlogQueryStatusVarSqlModeCodeBitMask> {
   const BinlogQueryStatusVarSqlModeCodeBitMask({
     required this.name,
@@ -424,6 +630,14 @@ class BinlogQueryStatusVarSqlModeCodeBitMask
 
   @override
   final int bitMask;
+
+  @override
+  List<Object> get props => [bitMask];
+
+  @override
+  String toString() {
+    return "$name(${bitMask.toRadixString(16)})";
+  }
 
   @Reference(kind: ReferenceKind.kBitMaskItem)
   static const kModeRealAsFloat = BinlogQueryStatusVarSqlModeCodeBitMask(
@@ -622,34 +836,123 @@ class BinlogQueryStatusVarSqlModeCodeBitMask
   );
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_AUTO_INCREMENT")
 abstract class BinlogQueryStatusVarAutoIncrement
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "autoincrement_increment")
   int get increment;
 
+  @Field()
+  @SerializedField(name: "autoincrement_offset")
   int get offset;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "autoincrement_increment",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    yield context.readAsScalar(
+      name: "autoincrement_offset",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_CATALOG")
 abstract class BinlogQueryStatusVarCatalog
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "length")
   int get length;
 
-  String get catalogName;
+  @Field()
+  @SerializedField(name: "catalog")
+  String get catalog;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "length",
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    yield context.readAsScalar(
+      name: "catalog",
+      reader: Scalar.nullTerminatedString(),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_CHARSET_CODE")
 abstract class BinlogQueryStatusVarCharsetCode
-    implements BinlogQueryStatusVarValue {
-  int get characterSetClient;
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "client_character_set")
+  int get clientCharacterSet;
 
+  @Field()
+  @SerializedField(name: "collation_connection")
   int get collationConnection;
 
+  @Field()
+  @SerializedField(name: "collation_server")
   int get collationServer;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "client_character_set",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    yield context.readAsScalar(
+      name: "collation_connection",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    yield context.readAsScalar(
+      name: "collation_server",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_TIME_ZONE_CODE")
 abstract class BinlogQueryStatusVarTimeZoneCode
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "length")
   int get length;
 
-  String get timezone;
+  @Field()
+  @SerializedField(name: "time_zone")
+  String get timeZone;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "length",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    final length = context.fields["length"];
+    if (length > 0) {
+      yield context.readAsScalar(
+        name: "time_zone",
+        reader: Scalar.fixedLengthInteger(length),
+      );
+    }
+  }
 }
 
 ///
@@ -657,54 +960,208 @@ abstract class BinlogQueryStatusVarTimeZoneCode
 ///
 /// [source_code]: https://github.com/mysql/mysql-server/blob/8.0/libbinlogevents/include/statement_events.h#L483
 ///
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_CATALOG_NZ_CODE")
 abstract class BinlogQueryStatusVarCatalogNzCode
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "length")
   int get length;
 
-  String get catalogName;
+  @Field()
+  @SerializedField(name: "catalog")
+  String get catalog;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "length",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+    final length = context.fields["length"];
+    if (length > 0) {
+      yield context.readAsScalar(
+        name: "catalog",
+        reader: Scalar.fixedLengthInteger(length),
+      );
+    }
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_LC_TIME_NAMES_CODE")
 abstract class BinlogQueryStatusVarLCTimeNamesCode
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "locale_code")
   int get localeCode;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "locale_code",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_CHARSET_DATABASE_CODE")
 abstract class BinlogQueryStatusVarCharsetDatabaseCode
-    implements BinlogQueryStatusVarValue {
-  String get databaseCollation;
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "database_collation")
+  int get databaseCollation;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "database_collation",
+      reader: Scalar.fixedLengthInteger(2),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_TABLE_MAP_FOR_UPDATE_CODE")
 abstract class BinlogQueryStatusVarTableMapForUpdateCode
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "bit_mask")
   int get bitMask;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "bit_mask",
+      reader: Scalar.fixedLengthInteger(8),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_MASTER_DATA_WRITTEN_CODE")
 abstract class BinlogQueryStatusVarMasterDataWrittenCode
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "original_event_length")
   int get originalEventLength;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "original_event_length",
+      reader: Scalar.fixedLengthInteger(4),
+    );
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_INVOKERS")
 abstract class BinlogQueryStatusVarInvokers
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "user_name_length")
   int get usernameLength;
 
+  @Field()
+  @SerializedField(name: "user_name")
   String get username;
 
+  @Field()
+  @SerializedField(name: "host_name_length")
   int get hostnameLength;
 
+  @Field()
+  @SerializedField(name: "host_name")
   String get hostname;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "user_name_length",
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    final usernameLen = context.fields["user_name_length"];
+    if (usernameLen > 0) {
+      yield context.readAsScalar(
+        name: "user_name",
+        reader: Scalar.fixedLengthString(usernameLen),
+      );
+    }
+    yield context.readAsScalar(
+      name: "host_name_length",
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    final hostnameLen = context.fields["host_name_length"];
+    if (hostnameLen > 0) {
+      yield context.readAsScalar(
+        name: "host_name",
+        reader: Scalar.fixedLengthString(usernameLen),
+      );
+    }
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_UPDATED_DB_NAMES")
 abstract class BinlogQueryStatusVarUpdatedDbNames
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "count")
   int get count;
 
+  @Field()
+  @SerializedField(name: "database_names")
   List<String> get databaseNames;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "count",
+      reader: Scalar.fixedLengthInteger(1),
+    );
+    final count = context.fields["count"];
+    for (var i = 0; i < count; i++) {
+      yield context.readAsArrayElement(
+        name: "database_names",
+        reader: Scalar.nullTerminatedString(),
+      );
+    }
+  }
 }
 
+@Reference(kind: ReferenceKind.kDataType)
+@Serialized(name: "Binlog::QUERY_EVENT::Q_MICROSECONDS")
 abstract class BinlogQueryStatusVarMicroseconds
-    implements BinlogQueryStatusVarValue {
+    implements BinlogQueryStatusVarValue, SerializationStepResolutionDelegate {
+  @Field()
+  @SerializedField(name: "microsecond_part")
   int get microsecondPart;
+
+  @override
+  Iterable<SerializationStep> resolveSteps(
+    SerializationStepResolutionContext context,
+  ) sync* {
+    yield context.readAsScalar(
+      name: "microsecond_part",
+      reader: Scalar.fixedLengthInteger(3),
+    );
+  }
 }
 
 Version getBinlogVersion(Version mysqlServerVersion) {
@@ -729,7 +1186,7 @@ Version getBinlogVersion(Version mysqlServerVersion) {
 
   throw ArgumentError.value(
     mysqlServerVersion,
-    'MySQL server version',
+    "MySQL server version",
     "Unknown MySQL server version",
   );
 }

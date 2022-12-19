@@ -26,17 +26,17 @@ abstract class AuthSwitchRequest
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'status_tag',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'plugin_name',
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'plugin_provided_data',
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }
@@ -54,9 +54,9 @@ abstract class OldAuthSwitchRequest
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'status_tag',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
   }
 }
@@ -73,9 +73,9 @@ abstract class AuthSwitchResponse
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'authentication_response_data',
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }
@@ -96,13 +96,13 @@ abstract class AuthMoreData implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'authentication_method_data',
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: 'authentication_method_data',
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }
@@ -127,17 +127,17 @@ abstract class AuthNextFactor implements SerializationStepResolutionDelegate {
   Iterable<SerializationStep> resolveSteps(
     SerializationStepResolutionContext context,
   ) sync* {
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "packet_type",
-      dataType: DataType.fixedLengthInteger(1),
+      reader: Scalar.fixedLengthInteger(1),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "plugin_name",
-      dataType: DataType.nullTerminatedString(),
+      reader: Scalar.nullTerminatedString(),
     );
-    yield context.readAsField(
+    yield context.readAsScalar(
       name: "plugin_provided_data",
-      dataType: DataType.restOfPacketString(),
+      reader: Scalar.restOfPacketString(),
     );
   }
 }

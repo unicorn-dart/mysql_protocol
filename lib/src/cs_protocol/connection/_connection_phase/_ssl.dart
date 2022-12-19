@@ -29,30 +29,30 @@ abstract class SSLRequest implements SerializationStepResolutionDelegate {
     SerializationStepResolutionContext context,
   ) sync* {
     if (context.capabilities.contains('CLIENT_PROTOCOL_41')) {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'client_flag',
-        dataType: DataType.fixedLengthInteger(4),
+        reader: Scalar.fixedLengthInteger(4),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'max_packet_size',
-        dataType: DataType.fixedLengthInteger(4),
+        reader: Scalar.fixedLengthInteger(4),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'character_set',
-        dataType: DataType.fixedLengthInteger(1),
+        reader: Scalar.fixedLengthInteger(1),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'filter',
-        dataType: DataType.fixedLengthString(23),
+        reader: Scalar.fixedLengthString(23),
       );
     } else {
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'client_flag',
-        dataType: DataType.fixedLengthInteger(2),
+        reader: Scalar.fixedLengthInteger(2),
       );
-      yield context.readAsField(
+      yield context.readAsScalar(
         name: 'max_packet_size',
-        dataType: DataType.fixedLengthInteger(3),
+        reader: Scalar.fixedLengthInteger(3),
       );
     }
   }
